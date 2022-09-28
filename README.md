@@ -3,7 +3,7 @@ The code is writtent in user-friendly English language. Every function in has na
 ```
 Input: .mp4 video
 
-Output: .npz file (and/or Frames with bounding boxes if save_maps = True)
+Output: .npz file (and/or Frames with bounding boxes if "save_maps = True")
 
 Main script: main.py
 ```
