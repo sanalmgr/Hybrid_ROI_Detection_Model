@@ -1,5 +1,6 @@
 # Hybrid_ROI_Detection_Model
 Input: .mp4 video
+
 Output: .npz file (and/or Frames with bounding boxes if ``` save_maps = True ```)
 
 Main script: main.py
