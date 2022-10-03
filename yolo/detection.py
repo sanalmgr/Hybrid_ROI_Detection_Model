@@ -195,8 +195,8 @@ class Yolo():
             top = box[1]
             width = box[2]
             height = box[3]
-            self.draw_bbox(base_frame, class_ids[i], confidences[i],
-                           left, top, left + width, top + height)
+            #self.draw_bbox(base_frame, class_ids[i], confidences[i],
+                           #left, top, left + width, top + height)
 
-        return base_frame, final_list_objs, objs_area
+        return final_list_objs, objs_area
 
