@@ -76,11 +76,11 @@ if __name__ == "__main__":
 #################END#################
 #%%
 #to load .npz file
-npzFiles = np.load('D:/Projects/6/saliency_model/all_in_one/output/Xinwen1_1.mp4/Xinwen1_1_coordinates.npz', allow_pickle=True)
-btmup_sal = npzFiles['btmup_sal']
-semantic_sal = npzFiles['semantic_sal']
-hybrid_sal = npzFiles['hybrid_sal']
-print(hybrid_sal[0])
-print(btmup_sal[0])
-print(semantic_sal[0])
+#npzFiles = np.load('D:/Projects/6/saliency_model/all_in_one/output/Xinwen1_1.mp4/Xinwen1_1_coordinates.npz', allow_pickle=True)
+#btmup_sal = npzFiles['btmup_sal']
+#semantic_sal = npzFiles['semantic_sal']
+#hybrid_sal = npzFiles['hybrid_sal']
+#print(hybrid_sal[0])
+#print(btmup_sal[0])
+#print(semantic_sal[0])
 
