@@ -26,7 +26,7 @@ The program uses the sk-video library to read video frames. You can install the 
 ## General requirements are:
 ```
 > Python 3.9.7
-> Tensorflow/  Keras  2.7.0
+> Tensorflow / Keras  2.7.0
 > OpenCV / OpenCV Contribution 4.5.5.64
 > Numpy 1.19.5
 ```
