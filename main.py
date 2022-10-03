@@ -30,7 +30,8 @@ save_maps = False
 
 # if number of predicted rois is less than the num_rois, all rois are returned.
 # based on largest areas, the rois are selected and returned.
-num_rois = 3  
+# set it to "all" for all predicted rois.s
+num_rois = 1 #1, 2, 3, "all", etc.
 
 path_to_output = 'D:/Projects/6/saliency_model/all_in_one/output/'
 
@@ -80,7 +81,7 @@ if __name__ == "__main__":
 #btmup_sal = npzFiles['btmup_sal']
 #semantic_sal = npzFiles['semantic_sal']
 #hybrid_sal = npzFiles['hybrid_sal']
-#print(hybrid_sal[0])
-#print(btmup_sal[0])
-#print(semantic_sal[0])
+#print(hybrid_sal[3])
+#print(btmup_sal[3])
+#print(semantic_sal[3])
 
