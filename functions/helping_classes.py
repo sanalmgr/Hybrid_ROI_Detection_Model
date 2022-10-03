@@ -228,9 +228,9 @@ def initialize_yolo360(path_to_yolo360):
 def get_detected_objects_yolo360(img, my_net, path_to_yolo360):
 	
 	projections = pano2stereo(img)
-	output_frame, bboxes, area_yolo = my_net.process_output(img, projections)
+	bboxes, area_yolo = my_net.process_output(img, projections)
 	
-	return output_frame, bboxes, area_yolo	
+	return bboxes, area_yolo	
 	
 	
 def compute_distance_and_merge_groups(bbox, obj_bbox):
@@ -268,49 +268,83 @@ def get_area_of_boxes(boxes):
 		area.append(w1*h1)
 	return area
 
-def refine_coords_as_frames_with_bbox(bbox, area, obj_bbox, area_yolo, coords_final, count, output_path, orig, save_maps):
-	#count += 1
-	coords_final = np.asarray(coords_final)
-	
-	if coords_final.size == 0:
-		#coords_final_new = []
-		if obj_bbox.size == 0:
-			max_ind = np.argmax(area)
-			x2,y2,w2,h2 = bbox[max_ind]
-			if save_maps:
-				cv2.rectangle(orig, (x2,y2), (x2+w2,y2+h2), (36,255,12), 2)
-				cv2.putText(orig, str(1), (x2, y2-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36,255,12), 1)
-				write_frame_with_bbox(output_path, count, orig)
-			return bbox[max_ind]
-		else:
-			max_ind = np.argmax(area_yolo)
-			x2,y2,w2,h2 = obj_bbox[max_ind]
-			if save_maps:
-				cv2.rectangle(orig, (x2,y2), (x2+w2,y2+h2), (36,255,12), 2)
-				cv2.putText(orig, str(1), (x2, y2-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36,255,12), 1)
-				write_frame_with_bbox(output_path, count, orig)
-			return obj_bbox[max_ind]
-	else:		
-		cc = 1
-		cord_area = get_area_of_boxes(coords_final)
-		max_ind = np.argmax(cord_area)
-		x2,y2,w2,h2 = coords_final[max_ind]
+def get_boxes_based_areas(boxes):
+	dict_bbox = []
+	for i in range(len(boxes)):
+		x1, y1, w1, h1 = boxes[i]
+		area = w1*h1
+		dict_bbox.append({"coords":boxes[i], "area":area})
+		
+	dict_bbox = pd.DataFrame(dict_bbox)
+	dict_bbox = (dict_bbox.sort_values(by=['area'], ascending=False)).reset_index()
+	return dict_bbox
+
+def get_selected_boxes(boxes, num_rois):
+	new_list = []
+	if num_rois > 1 and len(boxes) > num_rois:
+		for i in range(num_rois):
+			new_list.append(boxes[i])
+	elif num_rois > 1 and len(boxes) < num_rois:
+		for i in range(len(boxes)):
+			new_list.append(boxes[i])
+	else:
+		new_list = [boxes[0]]
+	return new_list
+
+def print_and_return_boxes(boxes, orig, save_maps, path, count):
+	coords_final_new = []
+	#jj = 1
+	if len(boxes) == 1:
+		x2, y2, w2, h2 = boxes[0]
 		if save_maps:
 			cv2.rectangle(orig, (x2,y2), (x2+w2,y2+h2), (36,255,12), 2)
 			cv2.putText(orig, str(1), (x2, y2-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36,255,12), 1)
-			write_frame_with_bbox(output_path, count, orig)
-		return coords_final[max_ind]
+			write_frame_with_bbox(path, str(count), orig)
+			coords_final_new = boxes[0]
+	else:
+		for c in range(len(boxes)):
+			x2, y2, w2, h2 = boxes[c]
+			if save_maps:
+				cv2.rectangle(orig, (x2,y2), (x2+w2,y2+h2), (36,255,12), 2)
+				cv2.putText(orig, str(c), (x2, y2-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36,255,12), 1)
+				write_frame_with_bbox(path, str(count), orig)
+				#jj += 1					
+			coords_final_new.append(boxes[c])
+		coords_final_new = np.asarray(coords_final_new)
+	
+	return coords_final_new
+
+
+def refine_coords_as_frames_with_bbox(bbox, obj_bbox, coords_final, count, output_path, orig, save_maps, num_rois):
+	#count += 1
+	coords_final = np.asarray(coords_final)	
+	if coords_final.size == 0:
+		if len(obj_bbox) == 0:
+			selectionA = get_selected_boxes(bbox["coords"].values, num_rois)
+			coords_final_new = print_and_return_boxes(selectionA, orig, save_maps, output_path+"/hybrid_sal/", count)				
+			return coords_final_new
+		else:
+			selectionB = get_selected_boxes(obj_bbox["coords"].values, num_rois)
+			coords_final_new = print_and_return_boxes(selectionB, orig, save_maps, output_path+"/hybrid_sal/", count)
+			return coords_final_new
+	else:
+		dict_cord_final = get_boxes_based_areas(coords_final)
+		selectionC = get_selected_boxes(dict_cord_final["coords"].values, num_rois)
+		coords_final_new = print_and_return_boxes(selectionC, orig, save_maps, output_path+"/hybrid_sal/", count)
+		return coords_final_new
 	#plt.imshow(orig)
 	
 
-def post_processing(predictions, my_net, orig_frame, save_maps, path_to_yolo360, path_to_output_maps, output_filename_npz):
+def post_processing(predictions, my_net, orig_frame, save_maps, path_to_yolo360, path_to_output_maps, output_filename_npz, num_rois):
 	print("Generating output from hybrid model...")
-	frame_number = []
-	frame_coords = []
-	for i in range(len(predictions))[:]:
+	btmup_sal = []
+	semantic_sal = []
+	hybrid_sal = []
+	for i in range(len(predictions))[:5]:
 		image_real = orig_frame[i]	
 		image = image_real.copy()
 		orig = image_real.copy()
+		orig_2 = image_real.copy()
 		#plt.imshow(image_real)
 		#plt.imshow(orig)
 		#plt.imshow(image)
@@ -321,25 +355,37 @@ def post_processing(predictions, my_net, orig_frame, save_maps, path_to_yolo360,
 		thresh = cv2.resize(thresh, (orig_width, orig_height))
 		#plt.imshow(thresh, cmap='gray')
 		
+		#btmup_sal prediction --- start
 		bbox, area = get_bbox_from_prediction(thresh)
 		bbox = np.asarray(bbox)
+		dict_bbox = get_boxes_based_areas(bbox)
+		selectionA = get_selected_boxes(dict_bbox["coords"].values, num_rois)
+		bbox_new = print_and_return_boxes(selectionA, orig, save_maps, path_to_output_maps+"/btmup_sal/", str(i))
+		#semantic_sal predictions --- end
 		
-		#yolov3 for 360-degree images
-		output_frame, obj_bbox, area_yolo = get_detected_objects_yolo360(image, my_net, path_to_yolo360)
+		#semantic_sal predictions --- start
+		obj_bbox, area_yolo = get_detected_objects_yolo360(image, my_net, path_to_yolo360)
 		obj_bbox = np.asarray(obj_bbox)
+		dict_obj_bbox = get_boxes_based_areas(obj_bbox)
+		selection_obj = get_selected_boxes(dict_obj_bbox["coords"].values, num_rois)
+		bbox_obj_new = print_and_return_boxes(selection_obj, orig_2, save_maps, path_to_output_maps+"/semantic_sal/", str(i))
+		#semantic_sal predictions --- end
 		
+		#hybrid_sal predictions --- start
 		coords_final = compute_distance_and_merge_groups(bbox, obj_bbox)
 		
-		coords_final = refine_coords_as_frames_with_bbox(bbox, area, obj_bbox, area_yolo, coords_final, i, path_to_output_maps, orig, save_maps)
+		coords_final = refine_coords_as_frames_with_bbox(dict_bbox, dict_obj_bbox, coords_final, i, path_to_output_maps, image_real, save_maps, num_rois)
+		#hybrid_sal predictions --- end
 		
 		#preparing to write output
-		frame_number.append(str(i))
-		frame_coords.append(coords_final)
+		btmup_sal.append(bbox_new)
+		semantic_sal.append(bbox_obj_new)
+		hybrid_sal.append(coords_final)
 		
-	write_npz_variables(path_to_output_maps, output_filename_npz, frame_number, frame_coords)
+	write_npz_variables(path_to_output_maps, output_filename_npz, btmup_sal, semantic_sal, hybrid_sal)
 		
-def write_npz_variables(path_to_output_maps, output_filename_npz, frame_number, frame_coords):
+def write_npz_variables(path_to_output_maps, output_filename_npz, btmup_sal, semantic_sal, hybrid_sal):
 	print("Writing variable...{} ".format(output_filename_npz))
 	BASE_PATH = path_to_output_maps
-	np.savez(os.path.join(BASE_PATH, output_filename_npz), frame_number=frame_number, frame_coords=frame_coords)
+	np.savez(os.path.join(BASE_PATH, output_filename_npz), btmup_sal=btmup_sal, semantic_sal=semantic_sal, hybrid_sal=hybrid_sal)
 	print("Saved with filename {} Done!".format(output_filename_npz))
