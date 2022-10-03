@@ -281,7 +281,10 @@ def get_boxes_based_areas(boxes):
 
 def get_selected_boxes(boxes, num_rois):
 	new_list = []
-	if num_rois > 1 and len(boxes) > num_rois:
+	if isinstance(num_rois, str):
+		for i in range(len(boxes)):
+			new_list.append(boxes[i])
+	elif num_rois > 1 and len(boxes) > num_rois:
 		for i in range(num_rois):
 			new_list.append(boxes[i])
 	elif num_rois > 1 and len(boxes) < num_rois:
