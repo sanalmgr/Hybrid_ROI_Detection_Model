@@ -340,7 +340,7 @@ def post_processing(predictions, my_net, orig_frame, save_maps, path_to_yolo360,
 	btmup_sal = []
 	semantic_sal = []
 	hybrid_sal = []
-	for i in range(len(predictions))[:5]:
+	for i in range(len(predictions))[:]:
 		image_real = orig_frame[i]	
 		image = image_real.copy()
 		orig = image_real.copy()
