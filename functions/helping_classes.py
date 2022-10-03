@@ -300,7 +300,7 @@ def print_and_return_boxes(boxes, orig, save_maps, path, count):
 			cv2.rectangle(orig, (x2,y2), (x2+w2,y2+h2), (36,255,12), 2)
 			cv2.putText(orig, str(1), (x2, y2-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36,255,12), 1)
 			write_frame_with_bbox(path, str(count), orig)
-		coords_final_new = [boxes[0]]
+		coords_final_new = boxes[0]
 	else:
 		for c in range(len(boxes)):
 			x2, y2, w2, h2 = boxes[c]
