@@ -26,7 +26,11 @@ import warnings
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 #%%
 # If set true, it will save frames with bounding boxes.
-save_maps = True
+save_maps = False
+
+# if number of predicted rois is less than the num_rois, all rois are returned.
+# based on largest areas, the rois are selected and returned.
+num_rois = 3  
 
 path_to_output = 'D:/Projects/6/saliency_model/all_in_one/output/'
 
@@ -45,6 +49,15 @@ output_filename_npz = video_name.split(".mp4")[0] + "_coordinates"
 dest = path_to_output + video_name + "/"
 if not os.path.exists(dest):
 	os.mkdir(dest)
+	
+if not os.path.exists(dest+"/btmup_sal/"):
+	os.mkdir(dest+"/btmup_sal/")
+	
+if not os.path.exists(dest+"/hybrid_sal/"):
+	os.mkdir(dest+"/hybrid_sal/")
+	
+if not os.path.exists(dest+"/semantic_sal/"):
+	os.mkdir(dest+"/semantic_sal/")
 #%%
 if __name__ == "__main__":
 	start_time = time.time()
@@ -54,23 +67,20 @@ if __name__ == "__main__":
 	orig_frame, mask_rgb, opt_map = preprocess_video(path2video, video_name)
 	
 	# Two-stream Model Evaluation
-	predictions = evaluate_2stream_model(mask_rgb, opt_map, path_to_hdf5_model)
+	frames_with_predictions = evaluate_2stream_model(mask_rgb, opt_map, path_to_hdf5_model)
 	
 	# Post-processing
-	post_processing(predictions, my_net, orig_frame, save_maps, path_to_yolo360, dest, output_filename_npz)
+	post_processing(frames_with_predictions, my_net, orig_frame, save_maps, path_to_yolo360, dest, output_filename_npz, num_rois)
 	
 	print("%s Hybrid model finsihed in seconds:" % (time.time() - start_time))
 #################END#################
 #%%
 #to load .npz file
-# npzFiles = np.load('D:/Projects/6/saliency_model/all_in_one/output/Xinwen1_1.mp4/Xinwen1_1_coordinates.npz', allow_pickle=True)
-# frame_numbers = npzFiles['frame_number']
-# frame_coords = npzFiles['frame_coords']
-# print(frame_coords[0])
-
-
-
-
-
-
+npzFiles = np.load('D:/Projects/6/saliency_model/all_in_one/output/Xinwen1_1.mp4/Xinwen1_1_coordinates.npz', allow_pickle=True)
+btmup_sal = npzFiles['btmup_sal']
+semantic_sal = npzFiles['semantic_sal']
+hybrid_sal = npzFiles['hybrid_sal']
+print(hybrid_sal[0])
+print(btmup_sal[0])
+print(semantic_sal[0])
 
