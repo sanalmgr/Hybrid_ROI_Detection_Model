@@ -22,6 +22,10 @@ The program uses the sk-video library to read video frames. You can install the 
 
 2. Setup the paths and parameters in ```main.py``` file accordingly, and run it.
 
+## Points to note: 
+Remeber that, if no object is found under a specific euclidean distance, then an empty set with 0 bounding boxes is returned. In this case, we give priority to the predictions of Multi-projection YOLOV3 (MPYOLO) model. But, it is worth demonstrating the difference in final performance by changing the priorities.
+In ```/functions/helping_classes.py``` file, the function ```refine_coords_as_frames_with_bbox``` sets the priority. In this function, ```obj_bbox```, ```bbox```, and ```coords_final``` represent the MPYOLO predictions, bottom-up saliency predictions, and the final predictions after computing euclidean distance, respectively.
+
 
 ## General requirements are:
 ```
