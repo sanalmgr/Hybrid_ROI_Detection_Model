@@ -66,14 +66,18 @@ if __name__ == "__main__":
 	my_net = initialize_yolo360(path_to_yolo360)
 	# Pre-processing
 	orig_frame, mask_rgb, opt_map = preprocess_video(path2video, video_name)
+	print("%s Pre-processing finsihed in seconds:" % (time.time() - start_time))
 	
+	start_time = time.time()
 	# Two-stream Model Evaluation
 	frames_with_predictions = evaluate_2stream_model(mask_rgb, opt_map, path_to_hdf5_model)
+	print("%s 2Stream testing finsihed in seconds:" % (time.time() - start_time))
 	
+	start_time = time.time()
 	# Post-processing
 	post_processing(frames_with_predictions, my_net, orig_frame, save_maps, path_to_yolo360, dest, output_filename_npz, num_rois)
 	
-	print("%s Hybrid model finsihed in seconds:" % (time.time() - start_time))
+	print("%s Post-processing finsihed in seconds:" % (time.time() - start_time))
 #################END#################
 #%%
 #to load .npz file
