@@ -1,4 +1,8 @@
 # Hybrid_ROI_Detection_Model
+
+Please refer to this [PDF: Deep Hybrid Model for Region of Interest
+Detection in Omnidirectional Videos](https://github.com/sanalmgr/Hybrid_ROI_Detection_Model/blob/main/Individual_Report.pdf) to know more about this project and the proposed method.
+
 The code is writtent in user-friendly English language. Every function in has name according to the purpose it serves.
 ```
 Input: .mp4 video
