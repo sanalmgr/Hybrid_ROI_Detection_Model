@@ -1,6 +1,6 @@
 # Hybrid_ROI_Detection_Model
 
-![Model Inference](two_stream_model/model_inference.png))
+![Model Inference](two_stream_model/model_inference.png)
 
 Please refer to this [PDF: Deep Hybrid Model for Region of Interest
 Detection in Omnidirectional Videos](https://github.com/sanalmgr/Hybrid_ROI_Detection_Model/blob/main/Individual_Report.pdf) to know more about this project and the proposed method.
