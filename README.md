@@ -19,7 +19,7 @@ The program uses the sk-video library to read video frames. You can install the 
 ```
 
 ## Instructions to run the code:
-1. Download the weights from [HERE]([https://drive.google.com/file/d/1P3PTSQ-iSyp6zq_V67QbU1Gb6rm38hE9/view?usp=sharing](https://drive.google.com/drive/folders/1HvhbzwYI9mMb7Zbl1P2cJRXpP9l-aJoX?usp=sharing)), and:
+1. Download the weights from [HERE](https://drive.google.com/drive/folders/1HvhbzwYI9mMb7Zbl1P2cJRXpP9l-aJoX?usp=sharing), and:
 
 - Add ```weights/two_stream_model/sal_model_t9.hdf5``` file into ```Hybrid_ROI_Detection_Model/two_stream_model``` folder.
 - Add ```weights/yolo/coco.names```, ```weights/yolo/yolov3.cfg```, and ```weights/yolo/yolov3.weights``` files into ```Hybrid_ROI_Detection_Model/yolo``` folder of the project.
